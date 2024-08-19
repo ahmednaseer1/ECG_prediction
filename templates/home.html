@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to ECG Prediction</h1>
+    <p>Upload your ECG image file to get predictions.</p>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <button type="submit">Upload and Predict</button>
+    </form>
+
+    <div id="result-box" class="hidden">
+        <h2 class="result-heading">Prediction Result:</h2>
+        <p id="result"></p>
+        <p id="details"></p>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#uploadForm").on("submit", function (event) {
+                event.preventDefault();
+        
+                var formData = new FormData(this);
+        
+                $.ajax({
+                    url: "/predict",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        // Split the response into result and details
+                        var [result, details] = response.split("<br>");
+        
+                        // Display the result and details with separate styles
+                        $("#result").html(result);
+                        $("#details").html(details);
+        
+                        // Show the result box by setting display to block
+                        $("#result-box").css("display", "block");
+                    },
+                    error: function () {
+                        $("#result").text("An error occurred while processing your request.");
+        
+                        // Show the result box even in case of error
+                        $("#result-box").css("display", "block");
+                    }
+                });
+            });
+        });
+        
+    </script>
+</body>
+</html>
